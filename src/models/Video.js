@@ -12,8 +12,9 @@ const videoSchema = new mongoose.Schema({
 });
 
 videoSchema.pre("save", async function () {
-  console.log("We are about to save", this);
-  this.title = "이렇게 middleware로 수정이 가능하다.";
+  this.hashtags = this.hashtags[0]
+    .split(",")
+    .map((word) => (word.startWith("#") ? word : `#${word}`));
 });
 
 const Video = mongoose.model("Video", videoSchema);
