@@ -111,11 +111,21 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
-    const email = emailData.find(
+    console.log("email data: ", emailData);
+    const emailObj = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
-    if (!email) {
+    if (!emailObj) {
       return res.redirect("/login");
+    }
+    const existingUser = await User.findOne({ email: emailObj.email });
+    if (existingUser) {
+      req.session.loggedIn = true;
+      req.session.user = existingUser;
+      console.log("why?:", existingUser);
+      return res.redirect("/");
+    } else {
+      // create an account
     }
   } else {
     return res.redirect("/login");
