@@ -13,9 +13,7 @@ export const postJoin = async (req, res) => {
       errorMessage: "Password confirmation does not match.",
     });
   }
-  const exists = await User.exists({
-    $or: [{ username }, { email }],
-  });
+  const exists = await User.exists({ $or: [{ username }, { email }] });
   if (exists) {
     return res.status(400).render("join", {
       pageTitle,
@@ -33,7 +31,7 @@ export const postJoin = async (req, res) => {
     return res.redirect("/login");
   } catch (error) {
     return res.status(400).render("join", {
-      pageTitle,
+      pageTitle: "Join",
       errorMessage: error._message,
     });
   }
@@ -152,19 +150,17 @@ export const postEdit = async (req, res) => {
     },
     body: { name, username, email, location },
   } = req;
-  await User.findByIdAndUpdate(_id, {
-    name,
-    username,
-    email,
-    location,
-  });
-  req.session.user = {
-    ...req.session.user,
-    name,
-    username,
-    email,
-    location,
-  };
+  const updateUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      name,
+      username,
+      email,
+      location,
+    },
+    { new: true }
+  );
+  req.session.user = updateUser;
   return res.redirect("/users/edit");
 };
 export const see = (req, res) => res.send("See User");
